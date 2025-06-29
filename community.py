@@ -7,7 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///board.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# DB 모델 (위에서 정의된 Post, Comment 클래스)
+# DB 모델
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +39,7 @@ class Comment(db.Model):
             "post": self.post_id
         }
 
-# DB 초기화 (애플리케이션 컨텍스트 내부에서 실행)
+# DB 초기화
 with app.app_context():
     db.create_all()
 
@@ -61,13 +61,13 @@ def bad_request_error(error):
     }), 400
 
 
-### 1. 게시글 전체 조회
+# 1. 게시글 전체 조회
 @app.route('/api/posts', methods=['GET'])
 def get_all_posts():
     posts = Post.query.all()
     return jsonify({"posts": [post.to_dict() for post in posts]}), 200
 
-### 2. 게시글 작성
+# 2. 게시글 작성
 @app.route('/api/posts', methods=['POST'])
 def create_post():
     data = request.get_json()
@@ -93,7 +93,7 @@ def create_post():
     db.session.commit()
     return jsonify({"message": "성공적으로 등록됐습니다."}), 200
 
-### 3. 게시글 개별 조회
+# 3. 게시글 개별 조회
 @app.route('/api/posts/<int:post_id>', methods=['GET'])
 def get_single_post(post_id):
     post = Post.query.get(post_id)
@@ -105,7 +105,7 @@ def get_single_post(post_id):
         }), 404
     return jsonify(post.to_dict()), 200
 
-### 4. 댓글 조회
+# 4. 댓글 조회
 @app.route('/api/posts/<int:post_id>/comment', methods=['GET'])
 def get_comments_for_post(post_id):
     post = Post.query.get(post_id)
@@ -119,7 +119,7 @@ def get_comments_for_post(post_id):
     comments = Comment.query.filter_by(post_id=post_id).all()
     return jsonify({"comments": [comment.to_dict() for comment in comments]}), 200
 
-### 5. 댓글 작성
+# 5. 댓글 작성
 @app.route('/api/posts/<int:post_id>/comment', methods=['POST'])
 def create_comment_for_post(post_id):
     post = Post.query.get(post_id)
